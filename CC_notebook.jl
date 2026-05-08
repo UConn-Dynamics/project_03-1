@@ -352,6 +352,54 @@ begin
     gif(anim, "multibody_motion.gif", fps=30)
 end
 
+# ╔═╡ 24336611-6d47-49c1-83b6-622e60b46741
+begin
+    # Uses the existing ODE solution from the notebook
+    block_positions = [state[1] for state in solution.u]
+    block_velocities = [state[7] for state in solution.u]
+
+    plot(
+        block_positions,
+        block_velocities,
+        xlabel = "Block Position x₁ (m)",
+        ylabel = "Block Velocity ẋ₁ (m/s)",
+        title = "Phase Plot of Sliding Block Motion",
+        label = "x₁ vs ẋ₁",
+        linewidth = 2
+    )
+end
+
+# ╔═╡ 78a81ca1-b95a-4315-8424-36096fb37211
+md"""
+### Additional Motion Plot
+
+This phase plot shows the relationship between the sliding block position and velocity during the simulation. It provides another way to visualize the system dynamics without modifying the existing solution method.
+"""
+
+# ╔═╡ d7ece38c-2f47-4a79-8bd7-8d663cc19e74
+md"""
+### Additional Plot: Constraint Equation Error
+
+This plot checks whether the constraint equations remain satisfied during the simulation. Since each constraint should ideally equal zero, values close to zero show that the augmented dynamics method is enforcing the block, track, and pin-joint constraints correctly.
+"""
+
+# ╔═╡ f3e8b61b-f721-40e1-8bc0-2a9e7cea739e
+begin
+    # Uses the existing constraint function and ODE solution
+    constraint_errors = [
+        C_fun(solution(time)[1:6], time)[constraint_number]
+        for time in t_steps, constraint_number in 1:4
+    ]
+
+    plot(t_steps, constraint_errors[:, 1], label="C1: y₁", linewidth=2)
+    plot!(t_steps, constraint_errors[:, 2], label="C2: θ₁", linewidth=2)
+    plot!(t_steps, constraint_errors[:, 3], label="C3: pin x", linewidth=2)
+    plot!(t_steps, constraint_errors[:, 4], label="C4: pin y", linewidth=2,
+          xlabel="Time (s)",
+          ylabel="Constraint Value",
+          title="Constraint Equation Error Over Time")
+end
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -3540,5 +3588,9 @@ version = "1.13.0+0"
 # ╠═7b6c7e5a-6a09-455d-b481-7d2cc258e099
 # ╠═68073f8b-618f-468c-896f-d841d22ec4a1
 # ╠═73a839af-b588-4808-a6c2-564fa46f046f
+# ╠═24336611-6d47-49c1-83b6-622e60b46741
+# ╠═78a81ca1-b95a-4315-8424-36096fb37211
+# ╠═d7ece38c-2f47-4a79-8bd7-8d663cc19e74
+# ╠═f3e8b61b-f721-40e1-8bc0-2a9e7cea739e
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
